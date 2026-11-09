@@ -1,0 +1,33 @@
+import { chromium } from 'playwright-core';
+const out = process.argv[2];
+const b = await chromium.connectOverCDP('http://127.0.0.1:9333');
+const p = b.contexts()[0].pages()[0];
+const errors = [];
+p.on('pageerror', (e) => errors.push(e.message));
+const st = () => p.evaluate((patch) => window.__stores.settings.getState().update(patch), arguments[0]);
+const update = (patch) => p.evaluate((patch) => window.__stores.settings.getState().update(patch), patch);
+const go = (s) => p.evaluate((s) => window.__stores.ui.getState().go(s), s);
+
+await update({ language: 'en', theme: 'dark' });
+await go('dashboard');
+await p.waitForTimeout(1500);
+await p.screenshot({ path: `${out}/en_dashboard.png` });
+await go('diagnosis');
+await p.waitForTimeout(1200);
+await p.screenshot({ path: `${out}/en_diagnosis.png` });
+
+await update({ language: 'cs' });
+await p.evaluate(() => window.__stores.ui.getState().toggleSidebar());
+await p.setViewportSize({ width: 1100, height: 660 });
+await go('dashboard');
+await p.waitForTimeout(1500);
+await p.screenshot({ path: `${out}/min_collapsed_dashboard.png` });
+await go('ping');
+await p.waitForTimeout(1500);
+await p.screenshot({ path: `${out}/min_collapsed_ping.png` });
+await p.evaluate(() => window.__stores.ui.getState().toggleSidebar());
+await go('channels');
+await p.waitForTimeout(2500);
+await p.screenshot({ path: `${out}/min_channels.png` });
+console.log('done', JSON.stringify(errors));
+await b.close();

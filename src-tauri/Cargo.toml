@@ -1,0 +1,53 @@
+[package]
+name = "wifinatio"
+version = "1.0.0"
+description = "Wifinatio – diagnostika Wi-Fi a internetu"
+authors = ["Semakod"]
+edition = "2021"
+rust-version = "1.85"
+
+[lib]
+name = "wifinatio_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-dialog = "2"
+tauri-plugin-notification = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"] }
+reqwest = { version = "0.13", default-features = false, features = ["native-tls", "stream", "json"] }
+futures-util = "0.3"
+bytes = "1"
+rusqlite = { version = "0.37", features = ["bundled"] }
+parking_lot = "0.12"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+rand = "0.9"
+thiserror = "2"
+log = "0.4"
+window-vibrancy = "0.6"
+winreg = "0.55"
+
+[dependencies.windows]
+version = "0.62"
+features = [
+  "Win32_Foundation",
+  "Win32_NetworkManagement_WiFi",
+  "Win32_NetworkManagement_IpHelper",
+  "Win32_NetworkManagement_Ndis",
+  "Win32_Networking_WinSock",
+  "Win32_System_Power",
+  "Win32_System_Registry",
+  "Win32_System_IO",
+]
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

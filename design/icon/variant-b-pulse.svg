@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E1A44"/><stop offset="1" stop-color="#1B1045"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.72" r="0.6">
+      <stop offset="0" stop-color="#3B82F6" stop-opacity="0.38"/><stop offset="1" stop-color="#3B82F6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22D3EE"/><stop offset="0.5" stop-color="#3B82F6"/><stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.16"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.03"/>
+    </linearGradient>
+  </defs>
+  <rect x="48" y="48" width="928" height="928" rx="212" fill="url(#bg)"/>
+  <rect x="48" y="48" width="928" height="928" rx="212" fill="url(#glow)"/>
+  <rect x="50" y="50" width="924" height="924" rx="210" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="4"/>
+  <g fill="none" stroke="url(#accent)" stroke-width="64" stroke-linecap="round">
+    <path d="M 194 452 A 400 400 0 0 1 830 452"/>
+    <path d="M 304 545 A 260 260 0 0 1 720 545"/>
+  </g>
+  <rect x="140" y="604" width="744" height="232" rx="116" fill="url(#glass)" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="4"/>
+  <path d="M 212 720 H 400 L 448 640 L 520 800 L 576 690 L 608 720 H 812" fill="none" stroke="#E0F7FF" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 48 400 V 260 A 212 212 0 0 1 260 48 H 764 A 212 212 0 0 1 976 260 V 400 Q 512 300 48 400 Z" fill="#FFFFFF" fill-opacity="0.05"/>
+</svg>

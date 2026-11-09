@@ -1,0 +1,265 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/geist';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------- Design tokens ---------------------------------------------------
+   Light is the base; .dark overrides. Status colours are tuned per theme so
+   text on glass stays WCAG AA in both. */
+:root {
+  --tint: rgb(236 241 250 / 0.78);
+  --tint-fallback: linear-gradient(160deg, #eef3fb 0%, #e6ebf7 55%, #ece8f8 100%);
+  --glass: rgb(255 255 255 / 0.62);
+  --glass-strong: rgb(255 255 255 / 0.86);
+  --glass-hover: rgb(255 255 255 / 0.78);
+  --glass-border: rgb(15 23 42 / 0.08);
+  --glass-highlight: rgb(255 255 255 / 0.9);
+  --shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 28px -12px rgb(30 41 82 / 0.18);
+  --fg: #0e1530;
+  --fg-muted: #4b5675;
+  --fg-faint: #7a84a0;
+  --line: rgb(15 23 42 / 0.08);
+  --cyan: #0891b2;
+  --blue: #2563eb;
+  --violet: #7c3aed;
+  --ok: #047857;
+  --warn: #b45309;
+  --bad: #be123c;
+  --ok-soft: rgb(16 185 129 / 0.14);
+  --warn-soft: rgb(245 158 11 / 0.16);
+  --bad-soft: rgb(244 63 94 / 0.13);
+  --blob-a: rgb(34 211 238 / 0.28);
+  --blob-b: rgb(59 130 246 / 0.24);
+  --blob-c: rgb(139 92 246 / 0.22);
+  --chart-grid: rgb(15 23 42 / 0.07);
+  --track: rgb(15 23 42 / 0.08);
+  color-scheme: light;
+}
+
+.dark {
+  --tint: rgb(8 12 30 / 0.74);
+  --tint-fallback: linear-gradient(160deg, #0a1030 0%, #0b0f24 50%, #140f2e 100%);
+  --glass: rgb(255 255 255 / 0.045);
+  --glass-strong: rgb(255 255 255 / 0.085);
+  --glass-hover: rgb(255 255 255 / 0.07);
+  --glass-border: rgb(255 255 255 / 0.09);
+  --glass-highlight: rgb(255 255 255 / 0.1);
+  --shadow: 0 1px 1px rgb(0 0 0 / 0.2), 0 18px 40px -20px rgb(0 0 0 / 0.6);
+  --fg: #eef1fb;
+  --fg-muted: #a5aeca;
+  --fg-faint: #737d9c;
+  --line: rgb(255 255 255 / 0.07);
+  --cyan: #22d3ee;
+  --blue: #60a5fa;
+  --violet: #a78bfa;
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --bad: #fb7185;
+  --ok-soft: rgb(52 211 153 / 0.13);
+  --warn-soft: rgb(251 191 36 / 0.13);
+  --bad-soft: rgb(251 113 133 / 0.14);
+  --blob-a: rgb(34 211 238 / 0.16);
+  --blob-b: rgb(59 130 246 / 0.17);
+  --blob-c: rgb(139 92 246 / 0.17);
+  --chart-grid: rgb(255 255 255 / 0.06);
+  --track: rgb(255 255 255 / 0.08);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: 'Geist Variable', 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-faint: var(--fg-faint);
+  --color-line: var(--line);
+  --color-glass: var(--glass);
+  --color-glass-strong: var(--glass-strong);
+  --color-glass-hover: var(--glass-hover);
+  --color-glass-border: var(--glass-border);
+  --color-cyan: var(--cyan);
+  --color-blue: var(--blue);
+  --color-violet: var(--violet);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad-soft: var(--bad-soft);
+  --color-track: var(--track);
+}
+
+/* ---------- Base ---------------------------------------------------------- */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  background: transparent;
+}
+
+/* Outside Tauri (plain browser preview) there is no Mica behind the page. */
+html:not(.tauri) body {
+  background: var(--tint-fallback);
+}
+
+body {
+  margin: 0;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'ss01', 'cv11';
+  overflow: hidden;
+  user-select: none;
+}
+
+input,
+textarea,
+.selectable {
+  user-select: text;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--blue) 30%, transparent);
+}
+
+/* Thin, quiet scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--track) transparent;
+}
+
+/* ---------- Surfaces ------------------------------------------------------ */
+@layer components {
+  .app-tint {
+    background: var(--tint);
+  }
+
+  /* No backdrop-filter: the ambient background is already soft, and blurring it
+     under every card would make the GPU re-blur each frame the background moves. */
+  /* Soft top-edge light, like light catching the rim of a glass pane: an inset
+     highlight plus a faint top gradient, without masks or extra layers. */
+  .glass {
+    position: relative;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--glass-highlight) 35%, transparent) 0%, transparent 120px),
+      var(--glass);
+    border: 1px solid var(--glass-border);
+    box-shadow:
+      inset 0 1px 0 var(--glass-highlight),
+      var(--shadow);
+  }
+
+  .glass-strong {
+    background: var(--glass-strong);
+    border: 1px solid var(--glass-border);
+  }
+
+  .accent-gradient {
+    background-image: linear-gradient(110deg, var(--cyan), var(--blue) 55%, var(--violet));
+  }
+
+  .accent-text {
+    background-image: linear-gradient(110deg, var(--cyan), var(--blue) 55%, var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+/* ---------- Live indicator (ongoing events only) -------------------------- */
+.pulse-dot {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+html.idle .pulse-dot {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot {
+    animation: none !important;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* Skeleton shimmer in glass style */
+.skeleton {
+  background: linear-gradient(90deg, var(--track) 0%, var(--glass-strong) 50%, var(--track) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: 10px;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---------- Print (PDF export of the diagnostic report) ------------------- */
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #0e1530 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  #root {
+    height: auto !important;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    --fg: #0e1530;
+    --fg-muted: #4b5675;
+    --fg-faint: #6b7590;
+    --glass: #fff;
+    --glass-strong: #f6f8fc;
+    --glass-border: #dde3ef;
+    --ok: #047857;
+    --warn: #b45309;
+    --bad: #be123c;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .glass {
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  @page {
+    margin: 16mm;
+  }
+}

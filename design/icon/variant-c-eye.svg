@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E1A44"/><stop offset="1" stop-color="#1B1045"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.58" r="0.55">
+      <stop offset="0" stop-color="#8B5CF6" stop-opacity="0.35"/><stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22D3EE"/><stop offset="0.5" stop-color="#3B82F6"/><stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+    <radialGradient id="iris" cx="0.4" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#67E8F9"/><stop offset="0.55" stop-color="#3B82F6"/><stop offset="1" stop-color="#6D28D9"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="48" y="48" width="928" height="928" rx="212" fill="url(#bg)"/>
+  <rect x="48" y="48" width="928" height="928" rx="212" fill="url(#glow)"/>
+  <rect x="50" y="50" width="924" height="924" rx="210" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="4"/>
+  <g fill="none" stroke="url(#accent)" stroke-linecap="round">
+    <path d="M 236 360 A 390 390 0 0 1 788 360" stroke-width="52"/>
+    <path d="M 176 600 Q 512 250 848 600 Q 512 900 176 600 Z" stroke-width="44" fill="#FFFFFF" fill-opacity="0.05" stroke-linejoin="round"/>
+  </g>
+  <circle cx="512" cy="600" r="138" fill="url(#iris)"/>
+  <circle cx="512" cy="600" r="138" fill="none" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="4"/>
+  <path d="M 452 612 A 85 85 0 0 1 572 612" fill="none" stroke="#E0F7FF" stroke-width="26" stroke-linecap="round"/>
+  <circle cx="512" cy="660" r="22" fill="#E0F7FF"/>
+  <ellipse cx="470" cy="520" rx="70" ry="34" fill="url(#sheen)" transform="rotate(-20 470 520)"/>
+  <path d="M 48 400 V 260 A 212 212 0 0 1 260 48 H 764 A 212 212 0 0 1 976 260 V 400 Q 512 300 48 400 Z" fill="#FFFFFF" fill-opacity="0.05"/>
+</svg>

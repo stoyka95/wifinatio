@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Wifinatio",
+  "version": "1.0.0",
+  "identifier": "cz.semakod.wifinatio",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Wifinatio",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 1100,
+        "minHeight": 700,
+        "center": true,
+        "decorations": false,
+        "transparent": true,
+        "shadow": true,
+        "visible": true,
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self'; connect-src ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "publisher": "Semakod",
+    "copyright": "© 2026 Semakod",
+    "category": "Utility",
+    "shortDescription": "Diagnostika Wi-Fi a internetu",
+    "longDescription": "Wifinatio přehledně ukáže stav Wi-Fi a internetového připojení a pomůže najít příčinu problémů: slabý signál, rušení, výpadky, skoky pingu, pomalé DNS.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "webviewInstallMode": { "type": "downloadBootstrapper" },
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["Czech", "English"],
+        "displayLanguageSelector": false
+      },
+      "wix": {
+        "language": ["cs-CZ", "en-US"]
+      }
+    }
+  }
+}
