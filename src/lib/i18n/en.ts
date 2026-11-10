@@ -186,10 +186,14 @@ export const en: Dict = {
     yourNetwork: 'your network',
     columns: { ssid: 'Network', bssid: 'BSSID', channel: 'Channel', band: 'Band', rssi: 'Signal', standard: 'Standard', security: 'Security', clients: 'Clients', load: 'Load' },
     recommendation: 'Recommended channel',
+    blockLabel: (block) => `channels ${block}`,
     recommendBody: (ch, width, n, strongest, dfs) =>
-      `Channel ${ch} (${width} MHz) overlaps ${n} other ${s(n, 'network', 'networks')}${strongest !== null ? `, the strongest at ${strongest} dBm` : ''}.${dfs ? ' It is a DFS channel: the router must briefly leave it when radar is detected.' : ' It is not a DFS channel.'}`,
-    currentIsBest: 'Your router is already on the best channel.',
-    currentOn: (ch) => `You currently transmit on channel ${ch}.`,
+      `${width > 20 ? 'Channel block' : 'Channel'} ${ch} (${width} MHz) overlaps ${n} other ${s(n, 'network', 'networks')}${strongest !== null ? `, the strongest at ${strongest} dBm` : ''}.${dfs ? ' It is a DFS channel: the router must briefly leave it when radar is detected.' : ' It is not a DFS channel.'}`,
+    currentIsBest: (ch, block, width) =>
+      width > 20
+        ? `Your router already uses the best block: channel ${ch} at ${width} MHz occupies channels ${block}.`
+        : 'Your router is already on the best channel.',
+    currentOn: (ch, block) => `You currently transmit on channel ${ch}${block ? ` (channels ${block})` : ''}.`,
     changeHint: 'Change the channel in the router admin (Wi-Fi / Wireless > Channel).',
     noRecommendation: 'A recommendation needs a connection in this band and scan results.',
     own24Missing:

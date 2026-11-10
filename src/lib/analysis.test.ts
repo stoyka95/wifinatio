@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { recommendChannel, span } from './channels';
+import { blockLabel, recommendChannel, span } from './channels';
 import { detectPeriodicSpikes, diagnose, routerIgnoresPing, type DiagnosisInput } from './diagnosis';
 import { alignWithVerdict, computeHealth } from './health';
 import { bufferbloatGrade, rateRssi, rssiToPercent, worstLevel } from './rating';
@@ -222,5 +222,12 @@ describe('channels', () => {
     );
     expect(rec?.best.channel).toBe(36);
     expect(rec?.best.dfs).toBe(false);
+  });
+
+  it('treats channel 48 at 80 MHz as the 36–48 block', () => {
+    const rec = recommendChannel([], '5', { ssid: 'Mine', widthMhz: 80, channel: 48 });
+    expect(rec?.current?.channel).toBe(rec?.best.channel);
+    expect(blockLabel(rec!.best)).toBe('36–48');
+    expect(blockLabel({ channel: 6, widthMhz: 20 })).toBe('6');
   });
 });

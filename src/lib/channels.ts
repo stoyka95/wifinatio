@@ -92,6 +92,10 @@ const evaluate = (band: Band, block: Block, neighbours: BssInfo[]): ChannelCandi
   };
 };
 
+/** "36–48" for an 80 MHz block starting at 36, "6" for a 20 MHz channel. */
+export const blockLabel = (c: { channel: number; widthMhz: number }): string =>
+  c.widthMhz > 20 ? `${c.channel}–${c.channel + (c.widthMhz / 20 - 1) * 4}` : `${c.channel}`;
+
 /**
  * Ranks channels for `band` against the visible neighbours. Networks broadcast by
  * the user's own router (same SSID or the connected BSSID) are ignored.

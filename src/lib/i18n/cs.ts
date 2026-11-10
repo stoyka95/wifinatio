@@ -196,10 +196,14 @@ export const cs = {
     yourNetwork: 'vaše síť',
     columns: { ssid: 'Síť', bssid: 'BSSID', channel: 'Kanál', band: 'Pásmo', rssi: 'Signál', standard: 'Standard', security: 'Zabezpečení', clients: 'Klienti', load: 'Vytížení' },
     recommendation: 'Doporučený kanál',
-    recommendBody: (ch: number, width: number, n: number, strongest: number | null, dfs: boolean) =>
-      `Kanál ${ch} (${width} MHz) překrývá ${n} ${plural(n, 'cizí síť', 'cizí sítě', 'cizích sítí')}${strongest !== null ? `, nejsilnější má ${strongest} dBm` : ''}.${dfs ? ' Jde o DFS kanál, při zachycení radaru ho router musí krátce opustit.' : ' Není to DFS kanál.'}`,
-    currentIsBest: 'Váš router už je na nejlepším kanálu.',
-    currentOn: (ch: number) => `Teď vysíláte na kanálu ${ch}.`,
+    blockLabel: (block: string) => `kanály ${block}`,
+    recommendBody: (ch: string, width: number, n: number, strongest: number | null, dfs: boolean) =>
+      `${width > 20 ? 'Blok kanálů' : 'Kanál'} ${ch} (${width} MHz) překrývá ${n} ${plural(n, 'cizí síť', 'cizí sítě', 'cizích sítí')}${strongest !== null ? `, nejsilnější má ${strongest} dBm` : ''}.${dfs ? ' Jde o DFS kanál, při zachycení radaru ho router musí krátce opustit.' : ' Není to DFS kanál.'}`,
+    currentIsBest: (ch: number, block: string, width: number) =>
+      width > 20
+        ? `Váš router už vysílá v nejlepším bloku: kanál ${ch} při šířce ${width} MHz zabírá kanály ${block}.`
+        : 'Váš router už je na nejlepším kanálu.',
+    currentOn: (ch: number, block: string | null) => `Teď vysíláte na kanálu ${ch}${block ? ` (kanály ${block})` : ''}.`,
     changeHint: 'Kanál se mění v administraci routeru (Wi-Fi / Wireless > Channel).',
     noRecommendation: 'Pro doporučení je potřeba připojení v tomto pásmu a výsledky skenu.',
     own24Missing:

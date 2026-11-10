@@ -10,7 +10,7 @@ import { Input, Segmented } from '@/components/ui/controls';
 import { InfoTip, Tooltip } from '@/components/ui/tooltip';
 import { useTicker } from '@/hooks/useLiveAnalysis';
 import { api } from '@/lib/api';
-import { recommendChannel } from '@/lib/channels';
+import { recommendChannel, blockLabel } from '@/lib/channels';
 import { cn } from '@/lib/cn';
 import { bandLabel, fmtPercent, shortStandard } from '@/lib/format';
 import { errorMessage, useT } from '@/lib/i18n';
@@ -39,17 +39,25 @@ const Recommendation = ({ networks, band }: { networks: BssInfo[]; band: Band })
   );
   if (!rec) return <p className="text-[13.5px] text-fg-muted">{t.channels.noRecommendation}</p>;
   const best = rec.best;
+  // Wide channels are compared as blocks: on 80 MHz, 36, 40, 44 and 48 are the same spectrum.
   const isCurrent = rec.current?.channel === best.channel;
+  const block = blockLabel(best);
+  const shown = isCurrent && own?.channel ? own.channel : best.channel;
   return (
     <div className="space-y-3">
       <div className="flex items-baseline gap-3">
-        <span className="accent-text num text-[44px] leading-none font-semibold tracking-[-0.04em]">{best.channel}</span>
+        <span className="accent-text num text-[44px] leading-none font-semibold tracking-[-0.04em]">{shown}</span>
         <span className="text-[13px] text-fg-muted">
-          {bandLabel(band)}, {best.widthMhz} MHz{best.dfs ? ', DFS' : ''}
+          {bandLabel(band)}, {best.widthMhz} MHz{best.widthMhz > 20 ? ` (${t.channels.blockLabel(block)})` : ''}
+          {best.dfs ? ', DFS' : ''}
         </span>
       </div>
-      <p className="text-[13.5px] text-fg">{t.channels.recommendBody(best.channel, best.widthMhz, best.neighbours, best.strongestRssi, best.dfs)}</p>
-      {own && <p className="text-[13.5px] font-medium text-fg">{isCurrent ? t.channels.currentIsBest : t.channels.currentOn(own.channel ?? 0)}</p>}
+      <p className="text-[13.5px] text-fg">{t.channels.recommendBody(block, best.widthMhz, best.neighbours, best.strongestRssi, best.dfs)}</p>
+      {own && (
+        <p className="text-[13.5px] font-medium text-fg">
+          {isCurrent ? t.channels.currentIsBest(own.channel ?? best.channel, block, best.widthMhz) : t.channels.currentOn(own.channel ?? 0, rec.current && rec.current.widthMhz > 20 ? blockLabel(rec.current) : null)}
+        </p>
+      )}
       {!isCurrent && <p className="text-[12.5px] text-fg-muted">{t.channels.changeHint}</p>}
     </div>
   );
