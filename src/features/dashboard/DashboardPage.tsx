@@ -54,10 +54,11 @@ const Verdict = () => {
 
 const KeyNumbers = () => {
   const t = useT();
-  const { gateway, internet, dnsMs } = useLiveAnalysis();
+  const { gateway, internet, dnsMs, routerSilent } = useLiveAnalysis();
   const rssi = useLiveStore((s) => s.wifi?.connection?.rssi ?? null);
   const band = useLiveStore((s) => s.wifi?.connection?.band ?? null);
-  const loss = Math.max(gateway?.lossPct ?? 0, internet?.lossPct ?? 0);
+  // A router that ignores ping is not losing packets: only the internet counts then.
+  const loss = Math.max(routerSilent ? 0 : (gateway?.lossPct ?? 0), internet?.lossPct ?? 0);
   const rssiLevel = rssi !== null ? rateRssi(rssi) : null;
   return (
     <div className="grid grid-cols-2 gap-4 border-t border-line pt-5 sm:grid-cols-3 lg:grid-cols-5">
@@ -65,9 +66,9 @@ const KeyNumbers = () => {
       <StatTile
         label={t.metric.gatewayPing}
         value={gateway?.avg != null ? fmtNumber(gateway.avg, gateway.avg < 10 ? 1 : 0) : '—'}
-        unit="ms"
+        unit={routerSilent ? undefined : 'ms'}
         level={gateway?.avg != null ? rateGatewayLatency(gateway.avg) : null}
-        hint={t.explain.gatewayPing}
+        hint={routerSilent ? t.explain.routerSilent : t.explain.gatewayPing}
       />
       <StatTile
         label={t.metric.internetPing}
@@ -76,7 +77,7 @@ const KeyNumbers = () => {
         level={internet?.avg != null ? rateInternetLatency(internet.avg) : null}
         hint={t.explain.internetPing}
       />
-      <StatTile label={t.metric.loss} value={gateway ? fmtNumber(loss, loss ? 1 : 0) : '—'} unit="%" level={gateway ? rateLoss(loss) : null} hint={t.explain.loss} />
+      <StatTile label={t.metric.loss} value={gateway || internet ? fmtNumber(loss, loss ? 1 : 0) : '—'} unit="%" level={gateway || internet ? rateLoss(loss) : null} hint={t.explain.loss} />
       <StatTile label={t.metric.dns} value={dnsMs !== null ? fmtNumber(dnsMs) : '—'} unit="ms" level={dnsMs !== null ? rateDns(dnsMs) : null} hint={t.explain.dns} />
     </div>
   );
@@ -179,7 +180,7 @@ const ConnectionCard = () => {
             {conn.bssid}
           </InfoRow>
           {conn.cipher && <InfoRow label={t.metric.cipher}>{conn.cipher.toUpperCase()}</InfoRow>}
-          <InfoRow label={t.metric.profile}>{conn.profile}</InfoRow>
+          {conn.profile && <InfoRow label={t.metric.profile}>{conn.profile}</InfoRow>}
         </div>
       </dl>
     </GlassCard>
@@ -201,7 +202,7 @@ const Sparklines = () => {
   const pingVersion = useLiveStore((s) => s.pingVersion);
   const ping = useLiveStore((s) => s.ping);
   const signal = useLiveStore((s) => s.signal);
-  const { gateway, internet } = useLiveAnalysis();
+  const { gateway, internet, routerSilent } = useLiveAnalysis();
   const rssi = useLiveStore((s) => s.wifi?.connection?.rssi ?? null);
 
   const { gw, inet, sig } = useMemo(() => {
@@ -219,7 +220,11 @@ const Sparklines = () => {
   return (
     <div className="flex flex-col gap-4 lg:col-span-5">
       <SparkCard title={`${t.metric.gatewayPing}, ${t.dashboard.last5min.toLowerCase()}`} value={fmtMs(gateway?.avg)}>
-        <Sparkline points={gw} color="cyan" unit="ms" ariaLabel={t.metric.gatewayPing} height={56} />
+        {routerSilent ? (
+          <p className="flex h-14 items-center text-[12.5px] text-fg-muted">{t.dashboard.routerSilent}</p>
+        ) : (
+          <Sparkline points={gw} color="cyan" unit="ms" ariaLabel={t.metric.gatewayPing} height={56} />
+        )}
       </SparkCard>
       <SparkCard title={t.metric.internetPing} value={fmtMs(internet?.avg)}>
         <Sparkline points={inet} color="blue" unit="ms" ariaLabel={t.metric.internetPing} height={56} />

@@ -175,6 +175,7 @@ impl PingHub {
     fn worker(&self, app: AppHandle, target: PingTarget, generation: u64) {
         let Ok(pinger) = Pinger::new() else { return };
         let fixed = target.address.as_deref().and_then(resolve_ipv4);
+        let mut fallback = GatewayFallback::default();
         while self.generation.load(Ordering::SeqCst) == generation {
             let interval = self.interval_ms.load(Ordering::Relaxed);
             let tick = Instant::now();
@@ -183,7 +184,12 @@ impl PingHub {
             // would report false packet loss right after start-up or while disconnected.
             let destination = fixed.or_else(|| self.gateway()).filter(|_| !self.offline.load(Ordering::Relaxed));
             if let Some(ip) = destination {
-                let rtt = pinger.echo(ip, interval.min(2000) as u32, EchoOptions::default()).rtt_ms;
+                let timeout_ms = interval.min(2000) as u32;
+                let rtt = if fixed.is_none() {
+                    fallback.probe(&pinger, ip, timeout_ms)
+                } else {
+                    pinger.echo(ip, timeout_ms, EchoOptions::default()).rtt_ms
+                };
                 let sample = PingSample { target: target.id.clone(), ts, rtt, scan: self.scan_active() };
                 self.push(sample.clone(), interval);
                 let _ = app.emit(EVENT_PING_SAMPLE, &sample);
@@ -203,6 +209,61 @@ impl PingHub {
         while buf.len() > cap {
             buf.pop_front();
         }
+    }
+}
+
+/// Many routers (and guest networks with client isolation) drop ICMP aimed at
+/// themselves while forwarding traffic normally, which would read as 100 % loss
+/// to the router while the internet answers. After a few silent echoes the
+/// gateway is measured by TCP connect time instead: a SYN answered by SYN-ACK
+/// or RST is one round trip, just like an echo reply.
+#[derive(Default)]
+struct GatewayFallback {
+    tcp_port: Option<u16>,
+    icmp_failures: u32,
+    tcp_failures: u32,
+}
+
+const FALLBACK_AFTER: u32 = 3;
+/// Port discovery is retried every so many silent echoes, not every second.
+const DISCOVERY_EVERY: u32 = 30;
+const FALLBACK_PORTS: [u16; 3] = [53, 80, 443];
+
+impl GatewayFallback {
+    fn probe(&mut self, pinger: &Pinger, ip: Ipv4Addr, timeout_ms: u32) -> Option<f64> {
+        if let Some(port) = self.tcp_port {
+            let rtt = tcp_rtt(ip, port, timeout_ms);
+            self.tcp_failures = if rtt.is_some() { 0 } else { self.tcp_failures + 1 };
+            if self.tcp_failures >= FALLBACK_AFTER {
+                // The port stopped answering: start over with ICMP.
+                *self = Self::default();
+            }
+            return rtt;
+        }
+        let rtt = pinger.echo(ip, timeout_ms, EchoOptions::default()).rtt_ms;
+        if rtt.is_some() {
+            self.icmp_failures = 0;
+            return rtt;
+        }
+        self.icmp_failures += 1;
+        if self.icmp_failures >= FALLBACK_AFTER && (self.icmp_failures - FALLBACK_AFTER) % DISCOVERY_EVERY == 0 {
+            self.tcp_port = FALLBACK_PORTS.into_iter().find(|&port| tcp_rtt(ip, port, 500).is_some());
+        }
+        None
+    }
+}
+
+/// TCP handshake time to `ip:port`. A refused connection still proves the host
+/// answered, except on Windows, which retries refused SYNs for about a second.
+fn tcp_rtt(ip: Ipv4Addr, port: u16, timeout_ms: u32) -> Option<f64> {
+    let addr = std::net::SocketAddr::from((ip, port));
+    let started = Instant::now();
+    let result = std::net::TcpStream::connect_timeout(&addr, Duration::from_millis(timeout_ms.max(1) as u64));
+    let rtt = started.elapsed().as_secs_f64() * 1000.0;
+    match result {
+        Ok(_) => Some(rtt),
+        Err(e) if cfg!(not(windows)) && e.kind() == std::io::ErrorKind::ConnectionRefused => Some(rtt),
+        Err(_) => None,
     }
 }
 
@@ -227,6 +288,13 @@ mod tests {
         assert_eq!(t[0].id, GATEWAY_ID);
         assert_eq!(t.len(), 4);
         assert_eq!(t[3].id, "custom:9.9.9.9");
+    }
+
+    #[test]
+    fn tcp_rtt_counts_refused_as_answer() {
+        // Nothing listens on port 1 of loopback: the RST is the answer.
+        let rtt = tcp_rtt(Ipv4Addr::LOCALHOST, 1, 500);
+        assert_eq!(rtt.is_some(), cfg!(not(windows)));
     }
 
     #[test]

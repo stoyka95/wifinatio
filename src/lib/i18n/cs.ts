@@ -116,6 +116,8 @@ export const cs = {
     },
     bssid: 'Adresa konkrétního přístupového bodu (vysílače). Při více vysílačích se stejným názvem sítě se podle ní pozná, ke kterému jste připojeni.',
     linkRate: 'Rychlost, kterou se adaptér domluvil s routerem. Skutečná rychlost internetu bývá zhruba poloviční.',
+    routerSilent:
+      'Router neodpovídá na ping (ICMP) ani na zkušební spojení, ale internet přes něj funguje. Bývá to nastavení routeru nebo sítě pro hosty, nejde o výpadek.',
     gatewayPing: 'Doba odezvy routeru. Po Wi-Fi je normální 1–5 ms. Vyšší hodnoty nebo skoky znamenají problém ve Wi-Fi nebo v zařízení.',
     internetPing: 'Doba odezvy serverů na internetu (1.1.1.1, 8.8.8.8). Zahrnuje Wi-Fi i síť poskytovatele.',
     jitter: 'Jak moc ping kolísá mezi jednotlivými měřeními. Vadí hlavně hovorům a hrám, ideálně pod 5 ms k routeru.',
@@ -146,16 +148,20 @@ export const cs = {
     local_unstable: () =>
       'Skoky pingu vznikají mezi notebookem a routerem, i když signál není slabý. Příčinou bývá rušení na kanálu nebo úspora energie adaptéru.',
     isp_unstable: () => 'Wi-Fi i router jsou v pořádku. Skoky a ztráty vznikají až za routerem, u poskytovatele.',
+    unstable_unknown: () =>
+      'Internet odpovídá se skoky nebo ztrátami. Router neodpovídá na ping, takže nejde rozlišit, jestli je příčina ve Wi-Fi, nebo u poskytovatele.',
     dns_failing: () => 'Internet funguje, ale DNS server neodpovídá, takže se weby nenačítají.',
     dns_slow: (p: { dnsMs?: number }) => `Připojení je stabilní, jen DNS odpovídá pomalu (${p.dnsMs} ms). Weby se otevírají se zpožděním.`,
     weak_signal: (p: { rssi?: number }) =>
       `Připojení zatím drží, ale signál je slabý (${p.rssi} dBm). Při větší zátěži můžou přijít výpadky.`,
     ok: () => 'Připojení je v pořádku.',
+    ok_router_silent: () => 'Připojení je v pořádku. Router jen neodpovídá na ping, což je běžné nastavení.',
     whereLabel: { none: 'Vše v pořádku', local: 'Problém ve Wi-Fi / zařízení', isp: 'Problém u poskytovatele', dns: 'Problém s DNS', unknown: 'Neurčeno' },
   },
   dashboard: {
     title: 'Přehled',
     connection: 'Aktuální připojení',
+    routerSilent: 'Router neodpovídá na ping, odezvu nelze změřit.',
     notConnectedTitle: 'Nejste připojeni k Wi-Fi',
     notConnectedBody: 'Připojte se k síti v nabídce Wi-Fi ve Windows. Wifinatio se hned začne měřit.',
     last5min: 'Posledních 5 minut',
@@ -396,6 +402,7 @@ export const cs = {
       signalFair: 'Signál je hraniční. Stabilitu může zhoršit rušení nebo překážky.',
       signalPoor: 'Signál je slabý. To je nejčastější příčina výpadků a skoků pingu.',
       gateway: (avg: string, jit: string, loss: string) => `Router: průměr ${avg}, jitter ${jit}, ztráta ${loss}.`,
+      gatewaySilent: 'Router neodpovídá na ping, internet přes něj ale funguje. Jeho odezvu nelze změřit, nejde o výpadek.',
       internet: (avg: string, jit: string, loss: string) => `Internet: průměr ${avg}, jitter ${jit}, ztráta ${loss}.`,
       dnsSystem: (ms: string) => `Systémový DNS: průměr ${ms}.`,
       dnsBetter: (name: string, ms: string) => `Rychlejší je ${name} (${ms}).`,

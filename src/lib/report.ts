@@ -1,6 +1,6 @@
 // Builds the human-readable diagnostic report from collected measurements.
 import { recommendChannel, span } from './channels';
-import type { Diagnosis } from './diagnosis';
+import { routerIgnoresPing, type Diagnosis } from './diagnosis';
 import { bandLabel, fmtDateTime, fmtMbps, fmtMs, fmtPercent } from './format';
 import type { Health } from './health';
 import type { Dict } from './i18n/cs';
@@ -86,7 +86,9 @@ export const buildReport = (input: ReportInput, t: Dict, now = Date.now()): Diag
 
   // Stability
   const { gateway, internet } = input;
-  if (gateway?.count) {
+  if (gateway?.count && routerIgnoresPing(gateway, internet ?? null)) {
+    findings.push({ section: 'stability', status: 'info', text: f.gatewaySilent });
+  } else if (gateway?.count) {
     const level = worstLevel([
       gateway.avg !== null ? rateGatewayLatency(gateway.avg) : 'poor',
       gateway.jitter !== null ? rateGatewayJitter(gateway.jitter) : 'good',

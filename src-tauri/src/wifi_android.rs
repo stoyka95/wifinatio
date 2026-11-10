@@ -85,6 +85,7 @@ impl WlanClient {
         let mut conn = WifiConnection {
             ssid: raw.ssid.unwrap_or_default(),
             bssid: raw.bssid.unwrap_or_default().to_ascii_lowercase(),
+            // Android has no saved-profile names distinct from the SSID.
             profile: String::new(),
             standard: raw.standard.unwrap_or_else(|| "unknown".into()),
             signal_quality: raw.rssi.map(rssi_to_quality).unwrap_or(0),
@@ -98,7 +99,6 @@ impl WlanClient {
             security: raw.security.unwrap_or_else(|| "unknown".into()),
             cipher: String::new(),
         };
-        conn.profile = conn.ssid.clone();
         enrich_with_bss(&mut conn, known_bss);
         status.connection = Some(conn);
         status

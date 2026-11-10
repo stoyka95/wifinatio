@@ -11,6 +11,7 @@ import {
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { useMemo } from 'react';
+import { isMobile } from '@/lib/platform';
 import { useUiStore } from '@/stores/ui';
 
 echarts.use([
@@ -80,6 +81,8 @@ export const baseTooltip = (c: ChartColors) => ({
   padding: [8, 12],
   textStyle: { color: c.fg, fontFamily: 'Geist Variable, Segoe UI, sans-serif', fontSize: 12 },
   extraCssText: 'border-radius:12px;backdrop-filter:blur(16px);box-shadow:0 12px 32px -12px rgba(0,0,0,.4);',
+  // On touch a tapped tooltip stays open; keep it inside the chart so it never covers the card title.
+  confine: isMobile,
 });
 
 export const axisStyle = (c: ChartColors) => ({

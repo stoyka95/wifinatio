@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { diagnose, type Diagnosis } from '@/lib/diagnosis';
+import { diagnose, routerIgnoresPing, type Diagnosis } from '@/lib/diagnosis';
 import { alignWithVerdict, computeHealth, type Health } from '@/lib/health';
 import { computeStats, mergeInternet, sliceWindow, type PingStats } from '@/lib/stats';
 import type { PingSample } from '@/lib/types';
@@ -14,6 +14,8 @@ export interface LiveAnalysis {
   internet: PingStats | null;
   dnsMs: number | null;
   dnsFailed: boolean;
+  /** The router drops ping while the internet answers: its latency and loss are unknown, not bad. */
+  routerSilent: boolean;
   health: Health;
   diagnosis: Diagnosis;
 }
@@ -40,11 +42,19 @@ export const analyse = (
   const gateway = gwSamples.length ? computeStats(gwSamples, spikeThresholdMs) : null;
   const internet = inetSamples.length ? computeStats(inetSamples, spikeThresholdMs) : null;
   const diagnosis = diagnose({ ...extra, gateway, internet });
+  const routerSilent = routerIgnoresPing(gateway, internet);
   const health = alignWithVerdict(
-    computeHealth({ connected: extra.connected, rssi: extra.rssi, gateway, internet, dnsMs: extra.dnsMs, dnsFailed: extra.dnsFailed }),
+    computeHealth({
+      connected: extra.connected,
+      rssi: extra.rssi,
+      gateway: routerSilent ? null : gateway,
+      internet,
+      dnsMs: extra.dnsMs,
+      dnsFailed: extra.dnsFailed,
+    }),
     diagnosis.severity,
   );
-  return { gateway, internet, dnsMs: extra.dnsMs, dnsFailed: extra.dnsFailed, health, diagnosis };
+  return { gateway, internet, dnsMs: extra.dnsMs, dnsFailed: extra.dnsFailed, routerSilent, health, diagnosis };
 };
 
 /** Live stats, health and diagnosis over the last `windowMs`. */

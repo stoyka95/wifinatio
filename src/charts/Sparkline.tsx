@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { EChartsOption } from 'echarts';
 import { Chart } from './Chart';
+import { isMobile } from '@/lib/platform';
 import { baseTooltip, useChartColors } from './echarts';
 
 interface SparklineProps {
@@ -23,6 +24,8 @@ export const Sparkline = ({ points, color, height = 64, unit, min, max, ariaLabe
       grid: { left: 0, right: 0, top: 6, bottom: 2 },
       tooltip: {
         ...baseTooltip(c),
+        // The card header already shows the value; a tap-opened tooltip would only hide it on phones.
+        show: !isMobile,
         trigger: 'axis',
         axisPointer: { type: 'line', lineStyle: { color: c.faint, width: 1 } },
         valueFormatter: (v) => (v === null || v === undefined ? '—' : `${Math.round(Number(v) * 10) / 10} ${unit}`),

@@ -108,6 +108,8 @@ export const en: Dict = {
           : 'weak signal. Expect drop-outs and ping spikes. Move closer to the router or add an access point.'),
     bssid: 'Address of the specific access point (radio). With several access points sharing one network name it shows which one you are on.',
     linkRate: 'The rate the adapter negotiated with the router. Real internet throughput is usually about half of it.',
+    routerSilent:
+      'The router answers neither ping (ICMP) nor test connections, yet the internet works through it. Usually a router or guest-network setting, not an outage.',
     gatewayPing: 'Router response time. Over Wi-Fi 1–5 ms is normal. Higher values or spikes point to a Wi-Fi or device problem.',
     internetPing: 'Response time of internet servers (1.1.1.1, 8.8.8.8). Includes both Wi-Fi and the provider network.',
     jitter: 'How much ping varies between measurements. Hurts calls and games; ideally below 5 ms to the router.',
@@ -137,15 +139,19 @@ export const en: Dict = {
     local_unstable: () =>
       'Ping spikes happen between the laptop and the router even though the signal is not weak. Usually channel interference or adapter power saving.',
     isp_unstable: () => 'Wi-Fi and router are fine. Spikes and loss appear beyond the router, at the provider.',
+    unstable_unknown: () =>
+      'The internet answers with spikes or loss. The router does not answer ping, so Wi-Fi and provider cannot be told apart.',
     dns_failing: () => 'The internet works but the DNS server does not answer, so websites do not load.',
     dns_slow: (p) => `The connection is stable, only DNS is slow (${p.dnsMs} ms). Websites open with a delay.`,
     weak_signal: (p) => `The connection holds for now, but the signal is weak (${p.rssi} dBm). Expect drop-outs under load.`,
     ok: () => 'Your connection is healthy.',
+    ok_router_silent: () => 'The connection is fine. The router just does not answer ping, which is a common setting.',
     whereLabel: { none: 'All good', local: 'Wi-Fi / device problem', isp: 'Provider problem', dns: 'DNS problem', unknown: 'Undetermined' },
   },
   dashboard: {
     title: 'Overview',
     connection: 'Current connection',
+    routerSilent: 'The router does not answer ping, so its response time is unknown.',
     notConnectedTitle: 'You are not connected to Wi-Fi',
     notConnectedBody: 'Connect to a network from the Windows Wi-Fi menu. Wifinatio starts measuring right away.',
     last5min: 'Last 5 minutes',
@@ -384,6 +390,7 @@ export const en: Dict = {
       signalFair: 'The signal is borderline. Interference or obstacles may hurt stability.',
       signalPoor: 'The signal is weak. This is the most common cause of drop-outs and ping spikes.',
       gateway: (avg, jit, loss) => `Router: average ${avg}, jitter ${jit}, loss ${loss}.`,
+      gatewaySilent: 'The router does not answer ping, yet the internet works through it. Its response time cannot be measured; this is not an outage.',
       internet: (avg, jit, loss) => `Internet: average ${avg}, jitter ${jit}, loss ${loss}.`,
       dnsSystem: (ms) => `System DNS: average ${ms}.`,
       dnsBetter: (name, ms) => `${name} is faster (${ms}).`,

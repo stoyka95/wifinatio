@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { recommendChannel, span } from './channels';
-import { detectPeriodicSpikes, diagnose, type DiagnosisInput } from './diagnosis';
+import { detectPeriodicSpikes, diagnose, routerIgnoresPing, type DiagnosisInput } from './diagnosis';
 import { alignWithVerdict, computeHealth } from './health';
 import { bufferbloatGrade, rateRssi, rssiToPercent, worstLevel } from './rating';
 import { computeStats, mergeInternet, sliceWindow } from './stats';
@@ -151,11 +151,25 @@ describe('diagnosis', () => {
 
   it('detects outages', () => {
     expect(diagnose({ ...base, internet: computeStats(series(Array(20).fill(null)), 50) }).code).toBe('internet_down');
-    expect(diagnose({ ...base, gateway: computeStats(series(Array(20).fill(null)), 50) }).code).toBe('router_down');
+    const lost = computeStats(series(Array(20).fill(null)), 50);
+    // A dead router takes the internet down with it.
+    expect(diagnose({ ...base, gateway: lost, internet: lost }).code).toBe('router_down');
     expect(diagnose({ ...base, connected: false }).code).toBe('disconnected');
   });
 
-  it('waits for enough samples', () => {
+  it('treats a router that ignores ping as unmeasured, not down', () => {
+    const silent = computeStats(series(Array(20).fill(null)), 50);
+    expect(routerIgnoresPing(silent, base.internet)).toBe(true);
+    const d = diagnose({ ...base, gateway: silent });
+    expect(d.code).toBe('ok_router_silent');
+    expect(d.severity).toBe('ok');
+    // Internet trouble cannot be placed without the router as a reference.
+    const unstable = diagnose({ ...base, gateway: silent, internet: randomSpiky(15) });
+    expect(unstable.code).toBe('unstable_unknown');
+    expect(unstable.location).toBe('unknown');
+  });
+
+    it('waits for enough samples', () => {
     expect(diagnose({ ...base, gateway: computeStats(steady(3, 4), 50) }).code).toBe('collecting');
   });
 

@@ -13,9 +13,11 @@ export type DiagnosisCode =
   | 'local_weak_signal'
   | 'local_unstable'
   | 'isp_unstable'
+  | 'unstable_unknown'
   | 'dns_failing'
   | 'dns_slow'
   | 'weak_signal'
+  | 'ok_router_silent'
   | 'ok';
 
 export type Severity = 'ok' | 'warn' | 'bad' | 'info';
@@ -40,6 +42,21 @@ export interface DiagnosisInput {
 }
 
 const MIN_SAMPLES = 10;
+/** Router loss at or above this, with the internet answering, means the router ignores ping. */
+const SILENT_ROUTER_LOSS_PCT = 95;
+
+/**
+ * Traffic to the internet goes through the router, so when the internet answers
+ * while the router never does, the router only ignores ping (ICMP filtering,
+ * guest networks). Its numbers then say nothing about the link.
+ */
+export const routerIgnoresPing = (gateway: PingStats | null, internet: PingStats | null): boolean =>
+  !!gateway &&
+  !!internet &&
+  gateway.count >= MIN_SAMPLES &&
+  internet.count >= MIN_SAMPLES &&
+  gateway.lossPct >= SILENT_ROUTER_LOSS_PCT &&
+  internet.lossPct < 50;
 const HEAVY_LOSS_PCT = 10;
 
 /** Unstable = noticeable loss, frequent spikes or high jitter. */
@@ -82,13 +99,14 @@ export const diagnose = (input: DiagnosisInput): Diagnosis => {
   const weak = rssi !== null && rateRssi(rssi) === 'poor';
   const rssiParam = rssi ?? undefined;
 
-  if (gateway.lossPct >= 50) return result('router_down', 'bad', 'local', { rssi: rssiParam });
+  const silentRouter = routerIgnoresPing(gateway, internet);
+  if (gateway.lossPct >= 50 && !silentRouter) return result('router_down', 'bad', 'local', { rssi: rssiParam });
   if (internet.lossPct >= 50) return result('internet_down', 'bad', 'isp');
 
-  const gatewayUnstable = isUnstable(gateway, THRESHOLDS.gatewayJitter.fair);
+  const gatewayUnstable = !silentRouter && isUnstable(gateway, THRESHOLDS.gatewayJitter.fair);
   const internetUnstable = isUnstable(internet, THRESHOLDS.internetJitter.fair);
 
-  const period = detectPeriodicSpikes(gateway.spikeTimes) ?? detectPeriodicSpikes(internet.spikeTimes);
+  const period = (silentRouter ? null : detectPeriodicSpikes(gateway.spikeTimes)) ?? detectPeriodicSpikes(internet.spikeTimes);
   if (period !== null && (gatewayUnstable || internetUnstable || gateway.spikes >= 4)) {
     return result('periodic_spikes', 'warn', 'local', { periodSec: period });
   }
@@ -100,11 +118,17 @@ export const diagnose = (input: DiagnosisInput): Diagnosis => {
       ? result('local_weak_signal', 'bad', 'local', { rssi: rssiParam })
       : result('local_unstable', heavy(gateway, 100), 'local', { rssi: rssiParam });
   }
-  if (internetUnstable) return result('isp_unstable', heavy(internet, 200), 'isp');
+  if (internetUnstable) {
+    // Without the router as a reference point, Wi-Fi and provider cannot be told apart.
+    return silentRouter
+      ? result('unstable_unknown', heavy(internet, 200), 'unknown', { rssi: rssiParam })
+      : result('isp_unstable', heavy(internet, 200), 'isp');
+  }
   if (input.dnsFailed) return result('dns_failing', 'bad', 'dns');
   if (input.dnsMs !== null && input.dnsMs > THRESHOLDS.dns.fair) {
     return result('dns_slow', 'warn', 'dns', { dnsMs: Math.round(input.dnsMs) });
   }
   if (weak) return result('weak_signal', 'warn', 'local', { rssi: rssiParam });
+  if (silentRouter) return result('ok_router_silent', 'ok', 'none');
   return result('ok', 'ok', 'none');
 };
