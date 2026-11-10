@@ -87,6 +87,7 @@ struct Monitor {
     last_netinfo: Option<Instant>,
     last_bss: Option<Instant>,
     last_auto_scan: Instant,
+    #[cfg_attr(mobile, allow(dead_code))]
     last_tooltip: Option<Instant>,
     force_netinfo: bool,
     dns_server: Option<IpAddr>,
@@ -321,6 +322,10 @@ impl Monitor {
         });
     }
 
+    #[cfg(mobile)]
+    fn update_tray_tooltip(&mut self, _status: &WifiStatus) {}
+
+    #[cfg(desktop)]
     fn update_tray_tooltip(&mut self, status: &WifiStatus) {
         if self.last_tooltip.is_some_and(|t| t.elapsed() < Duration::from_secs(5)) {
             return;

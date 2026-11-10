@@ -40,6 +40,7 @@ export const en: Dict = {
     rooms: 'Rooms',
     diagnosis: 'Diagnostics',
     settings: 'Settings',
+    more: 'More',
     collapse: 'Collapse sidebar',
     expand: 'Expand sidebar',
   },

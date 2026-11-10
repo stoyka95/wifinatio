@@ -127,7 +127,7 @@ export const SpectrumChart = ({ band, networks, ownSsid, hiddenLabel, height = 3
         ...axisStyle(c),
         splitLine: { show: false },
         axisTick: { show: false },
-        axisLabel: { ...axisStyle(c).axisLabel, customValues: axis.labels },
+        axisLabel: { ...axisStyle(c).axisLabel, customValues: axis.labels, hideOverlap: true },
       },
       yAxis: {
         type: 'value',

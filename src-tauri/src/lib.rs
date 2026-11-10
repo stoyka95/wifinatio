@@ -1,3 +1,5 @@
+#[cfg(target_os = "android")]
+mod android_bridge;
 mod commands;
 mod dns;
 mod error;
@@ -13,14 +15,25 @@ mod system;
 mod trace;
 mod wifi;
 
+#[cfg(desktop)]
 use tauri::menu::{Menu, MenuItem};
+#[cfg(desktop)]
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
-use tauri::{AppHandle, Manager, WindowEvent};
+#[cfg(desktop)]
+use tauri::WindowEvent;
+use tauri::{AppHandle, Manager};
 
-use settings::{Language, Theme};
+#[cfg(desktop)]
+use settings::Language;
+use settings::Theme;
 use state::AppState;
 
 /// Native Mica backdrop (Windows 11), falling back to Acrylic on older builds.
+/// Mobile has no window chrome: the page paints its own background.
+#[cfg(not(windows))]
+pub(crate) fn apply_window_effects(_app: &AppHandle, _theme: Theme) {}
+
+#[cfg(windows)]
 pub(crate) fn apply_window_effects(app: &AppHandle, theme: Theme) {
     let Some(window) = app.get_webview_window("main") else { return };
     let dark = match theme {
@@ -36,6 +49,7 @@ pub(crate) fn apply_window_effects(app: &AppHandle, theme: Theme) {
     }
 }
 
+#[cfg(desktop)]
 fn show_main_window(app: &AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.show();
@@ -44,6 +58,7 @@ fn show_main_window(app: &AppHandle) {
     }
 }
 
+#[cfg(desktop)]
 fn build_tray(app: &AppHandle, language: Language) -> tauri::Result<()> {
     let (show_label, quit_label) = match language {
         Language::Cs => ("Otevřít Wifinatio", "Ukončit"),
@@ -90,12 +105,14 @@ pub fn run() {
 
             let handle = app.handle().clone();
             apply_window_effects(&handle, settings.theme);
+            #[cfg(desktop)]
             build_tray(&handle, settings.language)?;
             hub.restart(handle.clone(), ping::default_targets(&settings.custom_targets), settings.ping_interval_ms);
             monitor::start(handle, hub);
             Ok(())
         })
         .on_window_event(|window, event| {
+            #[cfg(desktop)]
             if let WindowEvent::CloseRequested { api, .. } = event {
                 let state = window.state::<AppState>();
                 if state.settings.read().run_in_tray {
@@ -103,6 +120,8 @@ pub fn run() {
                     let _ = window.hide();
                 }
             }
+            #[cfg(mobile)]
+            let _ = (window, event);
         })
         .invoke_handler(tauri::generate_handler![
             commands::get_settings,
@@ -131,6 +150,7 @@ pub fn run() {
             commands::get_system_checks,
             commands::open_settings_page,
             commands::write_text_file,
+            commands::save_download,
             commands::request_close,
         ])
         .run(tauri::generate_context!())

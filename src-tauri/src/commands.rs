@@ -293,9 +293,33 @@ pub fn write_text_file(path: String, contents: String) -> AppResult<()> {
     std::fs::write(path, contents).map_err(Into::into)
 }
 
+/// Android: saves an exported report into Downloads and returns where it went.
+#[tauri::command]
+pub fn save_download(name: String, contents: String) -> AppResult<String> {
+    let lower = name.to_ascii_lowercase();
+    if ![".md", ".json", ".txt"].iter().any(|ext| lower.ends_with(ext)) || name.contains(['/', '\\', '\n']) {
+        return Err(AppError::msg("unsupported_extension"));
+    }
+    #[cfg(target_os = "android")]
+    {
+        crate::android_bridge::call_string_arg("saveDownload", &format!("{name}\n{contents}"))
+    }
+    #[cfg(not(target_os = "android"))]
+    {
+        let _ = contents;
+        Err(AppError::msg("unsupported_platform"))
+    }
+}
+
 /// Close button: hide to tray when enabled, otherwise quit.
 #[tauri::command]
 pub fn request_close(app: AppHandle, state: State<'_, AppState>) {
+    #[cfg(mobile)]
+    {
+        let _ = (app, state);
+        return;
+    }
+    #[cfg(desktop)]
     if state.settings.read().run_in_tray {
         if let Some(window) = app.get_webview_window("main") {
             let _ = window.hide();

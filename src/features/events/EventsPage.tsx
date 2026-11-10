@@ -98,7 +98,7 @@ export const EventsPage = () => {
       />
 
       <GlassCard className="mb-5">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <StatTile label={t.events.outagesTotal} value={events ? fmtNumber(summary.outages) : '—'} level={events ? (summary.outages === 0 ? 'good' : summary.outages < 3 ? 'fair' : 'poor') : null} />
           <StatTile label={t.events.outageTime} value={events ? fmtDuration(summary.offline) : '—'} />
           <StatTile label={t.events.filterProblems} value={events ? fmtNumber(summary.problems) : '—'} />

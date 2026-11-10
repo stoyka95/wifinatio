@@ -3,6 +3,7 @@ use serde::{Serialize, Serializer};
 /// Errors returned from Tauri commands. They serialize to a stable string code
 /// (for known cases) or a readable message, which the frontend localizes.
 #[derive(Debug, thiserror::Error)]
+#[cfg_attr(not(windows), allow(dead_code))]
 pub enum AppError {
     #[error("location_denied")]
     LocationDenied,

@@ -33,7 +33,7 @@ export const SpeedDial = ({ mbps, label, progress }: SpeedDialProps) => {
   const fraction = mbps === null ? 0 : scale(mbps);
   const track = arcPath(R, START, START + SWEEP);
   return (
-    <figure className="relative mx-auto w-[300px]" aria-live="polite" aria-label={`${label}: ${mbps === null ? '—' : Math.round(mbps)} Mb/s`}>
+    <figure className="relative mx-auto w-full max-w-[300px]" aria-live="polite" aria-label={`${label}: ${mbps === null ? '—' : Math.round(mbps)} Mb/s`}>
       <svg viewBox={`0 0 ${SIZE} ${SIZE * 0.86}`} className="w-full overflow-visible" aria-hidden>
         <defs>
           <linearGradient id="dial" x1="0" x2="1" y1="0" y2="0">

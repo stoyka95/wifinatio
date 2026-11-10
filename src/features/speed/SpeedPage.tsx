@@ -29,7 +29,7 @@ export const ResultTiles = ({ result }: { result: SpeedResult }) => {
   const loaded = loadedPing(result);
   const grade = bufferbloatGrade(result.idlePingMs, loaded);
   return (
-    <div className="grid grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
       <StatTile label={t.speed.download} value={fmtNumber(result.downloadMbps, result.downloadMbps < 10 ? 1 : 0)} unit="Mb/s" level={rateDownload(result.downloadMbps)} size="lg" />
       <StatTile label={t.speed.upload} value={fmtNumber(result.uploadMbps, result.uploadMbps < 10 ? 1 : 0)} unit="Mb/s" level={rateUpload(result.uploadMbps)} size="lg" />
       <StatTile label={t.speed.idlePing} value={fmtMs(result.idlePingMs).replace(' ms', '')} unit="ms" level={result.idlePingMs !== null ? rateInternetLatency(result.idlePingMs) : null} size="lg" />
@@ -101,10 +101,10 @@ export const SpeedPage = () => {
   return (
     <>
       <PageHeader title={t.speed.title} subtitle={t.speed.subtitle} />
-      <div className="mb-5 grid grid-cols-12 gap-5">
-        <GlassCard className="col-span-5 flex flex-col items-center justify-between gap-4 py-7">
+      <div className="mb-5 grid grid-cols-1 gap-5 lg:grid-cols-12">
+        <GlassCard className="flex flex-col items-center justify-between gap-4 py-7 lg:col-span-5">
           <SpeedDial mbps={dialValue} label={dialLabel} progress={overall} />
-          <ol className="flex gap-2" aria-label={t.speed.title}>
+          <ol className="flex flex-wrap justify-center gap-2" aria-label={t.speed.title}>
             {PHASES.map((p, i) => {
               const done = (running && PHASES.indexOf(phase as SpeedPhase) > i) || (!running && !!result);
               const active = running && phase === p;
@@ -138,7 +138,7 @@ export const SpeedPage = () => {
           <p className="text-[12px] text-fg-faint">{t.speed.dataNote}</p>
         </GlassCard>
 
-        <div className="col-span-7 flex flex-col gap-5">
+        <div className="flex flex-col gap-5 lg:col-span-7">
           {error && <Banner severity="bad" title={error} />}
           <GlassCard title={result ? t.speed.phases.done : t.speed.historyChart} className="flex-1">
             {result ? (
@@ -161,7 +161,8 @@ export const SpeedPage = () => {
 
       {history.length > 0 && (
         <GlassCard padded={false} title={t.speed.history} className="overflow-hidden">
-          <table className="w-full text-left text-[13px]">
+          <div className="overflow-x-auto">
+          <table className="w-full text-left text-[13px] whitespace-nowrap">
             <thead className="text-[12px] text-fg-muted">
               <tr className="border-b border-line">
                 <th className="py-3 pr-3 pl-5 font-medium">{t.common.time}</th>
@@ -193,6 +194,7 @@ export const SpeedPage = () => {
               })}
             </tbody>
           </table>
+          </div>
         </GlassCard>
       )}
     </>

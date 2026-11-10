@@ -126,7 +126,7 @@ const SaveSnapshot = ({ rooms, onSaved }: { rooms: string[]; onSaved: () => void
   };
 
   return (
-    <GlassCard title={t.rooms.save} className="col-span-4">
+    <GlassCard title={t.rooms.save} className="lg:col-span-4">
       <div className="space-y-3">
         <label className="block text-[12.5px] text-fg-muted" htmlFor="room-select">
           {t.rooms.room}
@@ -197,10 +197,10 @@ export const RoomsPage = () => {
   return (
     <>
       <PageHeader title={t.rooms.title} subtitle={t.rooms.subtitle} />
-      <div className="mb-5 grid grid-cols-12 gap-5">
+      <div className="mb-5 grid grid-cols-1 gap-5 lg:grid-cols-12">
         <SaveSnapshot rooms={rooms} onSaved={load} />
         <GlassCard
-          className="col-span-8"
+          className="lg:col-span-8"
           title={t.rooms.compare}
           actions={
             <Segmented
@@ -261,7 +261,8 @@ export const RoomsPage = () => {
             </Select>
           }
         >
-          <table className="w-full text-left text-[13px]">
+          <div className="overflow-x-auto">
+<table className="w-full text-left whitespace-nowrap text-[13px]">
             <thead className="text-[12px] text-fg-muted">
               <tr className="border-b border-line">
                 <th className="py-3 pr-3 pl-5 font-medium">{t.common.time}</th>
@@ -310,6 +311,7 @@ export const RoomsPage = () => {
               })}
             </tbody>
           </table>
+</div>
         </GlassCard>
       )}
     </>

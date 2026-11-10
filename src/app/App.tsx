@@ -8,6 +8,7 @@ import { useUiStore, type Section } from '@/stores/ui';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { Background } from './Background';
 import { LocationNotice } from './LocationNotice';
+import { MobileNav, MobileTopBar } from './MobileNav';
 import { Sidebar } from './Sidebar';
 import { Titlebar } from './Titlebar';
 import { useAppTheme, useIdleClass } from './useAppTheme';
@@ -62,7 +63,8 @@ export const App = () => {
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col">
             <Titlebar />
-            <main className="min-h-0 flex-1 overflow-y-auto px-7 pb-10" id="main">
+            <MobileTopBar />
+            <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 lg:px-7 lg:pb-10" id="main">
               <div className="mx-auto w-full max-w-[1480px]">
                 <div className="mb-4 empty:hidden">
                   <LocationNotice startedAt={startedAt} />
@@ -82,6 +84,7 @@ export const App = () => {
                 </AnimatePresence>
               </div>
             </main>
+            <MobileNav />
           </div>
         </div>
       </TooltipProvider>

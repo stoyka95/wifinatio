@@ -1,8 +1,14 @@
 node_modules/
 dist/
 src-tauri/target/
-src-tauri/gen/
+src-tauri/gen/schemas/
 design/icon/build/
 *.log
 .DS_Store
 release/
+
+# Android signing and build outputs
+*.apk
+*.aab
+*.jks
+*.keystore

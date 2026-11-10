@@ -145,12 +145,13 @@ export const buildReport = (input: ReportInput, t: Dict, now = Date.now()): Diag
     if (grade && level !== 'good') addAction({ id: 'fixBufferbloat', text: a.fixBufferbloat });
   }
 
-  // Windows
+  // Windows (or the phone on Android, where shell commands and adapter power saving do not exist)
   const sysChecks = input.system;
+  const android = sysChecks?.platform === 'android';
   const powerSaving = sysChecks ? (sysChecks.onBattery ? sysChecks.wifiPowerSavingDc : sysChecks.wifiPowerSavingAc) : null;
   // Suggest turning power saving off only when it is on or could not be read.
   const suggestPowerSaving = () => {
-    if (powerSaving !== 0) addAction({ id: 'disablePowerSaving', text: a.disablePowerSaving, command: a.powerSavingCommand });
+    if (!android && powerSaving !== 0) addAction({ id: 'disablePowerSaving', text: a.disablePowerSaving, command: a.powerSavingCommand });
   };
   if (sysChecks) {
     const saving = powerSaving;
@@ -206,11 +207,11 @@ export const buildReport = (input: ReportInput, t: Dict, now = Date.now()): Diag
       break;
     case 'router_down':
       addAction({ id: 'checkRouter', text: a.checkRouter });
-      addAction({ id: 'resetNetwork', text: a.resetNetwork, command: a.resetNetworkCommand, admin: true });
+      if (!android) addAction({ id: 'resetNetwork', text: a.resetNetwork, command: a.resetNetworkCommand, admin: true });
       break;
     case 'dns_failing':
     case 'dns_slow':
-      addAction({ id: 'flushDns', text: a.flushDns, command: a.flushDnsCommand });
+      addAction({ id: 'flushDns', text: a.flushDns, command: android ? undefined : a.flushDnsCommand });
       break;
     default:
       break;

@@ -98,7 +98,8 @@ export const PingPage = () => {
       </GlassCard>
 
       <GlassCard padded={false} className="overflow-hidden">
-        <table className="w-full text-left text-[13.5px]">
+        <div className="overflow-x-auto">
+<table className="w-full text-left whitespace-nowrap text-[13.5px]">
           <thead className="text-[12px] text-fg-muted">
             <tr className="border-b border-line">
               <th className="px-5 py-3 font-medium">{t.ping.target}</th>
@@ -162,6 +163,7 @@ export const PingPage = () => {
             })}
           </tbody>
         </table>
+</div>
       </GlassCard>
     </>
   );

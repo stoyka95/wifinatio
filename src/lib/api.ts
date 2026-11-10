@@ -47,6 +47,7 @@ export const api = {
   getSystemChecks: () => invoke<SystemChecks>('get_system_checks'),
   openSettingsPage: (uri: string) => invoke<void>('open_settings_page', { uri }),
   writeTextFile: (path: string, contents: string) => invoke<void>('write_text_file', { path, contents }),
+  saveDownload: (name: string, contents: string) => invoke<string>('save_download', { name, contents }),
   requestClose: () => invoke<void>('request_close'),
 };
 

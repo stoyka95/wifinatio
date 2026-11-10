@@ -11,6 +11,7 @@ import { reloadPingHistory } from '@/lib/bridge';
 import { confirmAction } from '@/lib/dialog';
 import { useT } from '@/lib/i18n';
 import type { HistoryKind, Settings } from '@/lib/types';
+import { isMobile } from '@/lib/platform';
 import { useSettingsStore } from '@/stores/settings';
 
 const INTERVALS = [500, 1000, 2000, 5000];
@@ -59,7 +60,7 @@ export const SettingsPage = () => {
   return (
     <>
       <PageHeader title={t.settings.title} actions={status && <span className="text-[13px] font-medium text-ok" role="status">{status}</span>} />
-      <div className="grid grid-cols-2 items-start gap-5">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
         <div className="flex flex-col gap-5">
           <GlassCard title={t.settings.measurement}>
             <div className="divide-y divide-line">
@@ -154,9 +155,11 @@ export const SettingsPage = () => {
 
           <GlassCard title={t.settings.behaviour}>
             <div className="divide-y divide-line">
-              <Field label={t.settings.tray} hint={t.settings.trayHint} htmlFor="tray">
-                <Switch id="tray" checked={settings.runInTray} onCheckedChange={(runInTray) => apply({ runInTray })} />
-              </Field>
+              {!isMobile && (
+                <Field label={t.settings.tray} hint={t.settings.trayHint} htmlFor="tray">
+                  <Switch id="tray" checked={settings.runInTray} onCheckedChange={(runInTray) => apply({ runInTray })} />
+                </Field>
+              )}
               <Field label={t.settings.notifications} htmlFor="notify">
                 <Switch id="notify" checked={settings.notifications} onCheckedChange={(notifications) => apply({ notifications })} />
               </Field>

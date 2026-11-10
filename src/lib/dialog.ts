@@ -1,5 +1,6 @@
 import { ask, save } from '@tauri-apps/plugin-dialog';
 import { api } from './api';
+import { isAndroid } from './platform';
 
 const isTauri = '__TAURI_INTERNALS__' in window;
 
@@ -14,6 +15,11 @@ export const saveTextFile = async (defaultName: string, contents: string, extens
     const link = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: defaultName });
     link.click();
     URL.revokeObjectURL(link.href);
+    return true;
+  }
+  if (isAndroid) {
+    // No file picker paths on Android: the report goes straight to Downloads.
+    await api.saveDownload(defaultName, contents);
     return true;
   }
   const path = await save({

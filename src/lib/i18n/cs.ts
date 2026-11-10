@@ -40,6 +40,7 @@ export const cs = {
     rooms: 'Místnosti',
     diagnosis: 'Diagnostika',
     settings: 'Nastavení',
+    more: 'Další',
     collapse: 'Sbalit panel',
     expand: 'Rozbalit panel',
   },

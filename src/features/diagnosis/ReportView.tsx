@@ -6,6 +6,7 @@ import { SeverityIcon } from '@/components/glass/status';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import { copyText, saveTextFile } from '@/lib/dialog';
+import { isAndroid } from '@/lib/platform';
 import { fmtDateTime } from '@/lib/format';
 import { useT } from '@/lib/i18n';
 import { reportToMarkdown, type DiagnosticReport, type ReportSection } from '@/lib/report';
@@ -84,10 +85,13 @@ export const ReportView = ({ report }: { report: DiagnosticReport }) => {
             <FileDown aria-hidden />
             {t.wizard.exportMd}
           </Button>
-          <Button size="sm" onClick={() => window.print()}>
-            <Printer aria-hidden />
-            {t.wizard.exportPdf}
-          </Button>
+          {/* Android's WebView has no print dialog; Markdown and JSON still export. */}
+          {!isAndroid && (
+            <Button size="sm" onClick={() => window.print()}>
+              <Printer aria-hidden />
+              {t.wizard.exportPdf}
+            </Button>
+          )}
           <Button size="sm" onClick={() => exportFile('json')}>
             <FileJson aria-hidden />
             {t.wizard.exportJson}
@@ -96,7 +100,7 @@ export const ReportView = ({ report }: { report: DiagnosticReport }) => {
         </div>
       </GlassCard>
 
-      <div className="grid grid-cols-2 items-start gap-5">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
         <GlassCard title={t.wizard.findings}>
           <div className="space-y-5">
             {sections.map((section) => (

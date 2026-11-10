@@ -1,9 +1,11 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
+import { isMobile } from './lib/platform';
 import './styles/index.css';
 
-if ('__TAURI_INTERNALS__' in window) document.documentElement.classList.add('tauri');
+// Desktop Tauri paints Mica behind a transparent page; phones get the gradient backdrop.
+if ('__TAURI_INTERNALS__' in window && !isMobile) document.documentElement.classList.add('tauri');
 
 if (import.meta.env.DEV) {
   // Handles for UI testing over CDP (scripts/ui-check.mjs); not present in release builds.

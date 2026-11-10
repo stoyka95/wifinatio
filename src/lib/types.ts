@@ -254,6 +254,8 @@ export interface SystemChecks {
   batteryPercent: number | null;
   driver: DriverInfo;
   location: LocationStatus;
+  /** Which checks apply; absent in reports saved before Android support. */
+  platform?: 'windows' | 'android' | 'other';
 }
 
 export type HistoryKind = 'events' | 'speedtests' | 'snapshots' | 'reports' | 'all';

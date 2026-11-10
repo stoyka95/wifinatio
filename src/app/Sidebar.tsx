@@ -49,8 +49,8 @@ const NavButton = ({ item, collapsed }: { item: NavItem; collapsed: boolean }) =
   );
 };
 
-/** Compact live status at the bottom of the sidebar. */
-const ConnectionPill = ({ collapsed }: { collapsed: boolean }) => {
+/** Compact live status at the bottom of the sidebar (and in the phone top bar). */
+export const ConnectionPill = ({ collapsed, compact = false }: { collapsed: boolean; compact?: boolean }) => {
   const t = useT();
   const wifi = useLiveStore((s) => s.wifi);
   const conn = wifi?.connection;
@@ -67,7 +67,7 @@ const ConnectionPill = ({ collapsed }: { collapsed: boolean }) => {
     );
   }
   return (
-    <div className="glass-strong flex items-center gap-3 rounded-xl px-3 py-2.5">
+    <div className={cn('glass-strong flex items-center gap-3 rounded-xl px-3', compact ? 'py-1.5' : 'py-2.5')}>
       <LevelDot level={wifi ? level : null} className="size-2.5" />
       <div className="min-w-0">
         <p className="truncate text-[13px] font-medium text-fg">{title}</p>
@@ -88,7 +88,7 @@ export const Sidebar = () => {
       initial={false}
       animate={{ width: collapsed ? 72 : 236 }}
       transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-      className="relative z-20 flex h-full shrink-0 flex-col px-3 pb-3"
+      className="relative z-20 hidden h-full shrink-0 flex-col px-3 pb-3 lg:flex"
     >
       <div data-tauri-drag-region className={cn('flex h-14 items-center gap-2.5 px-1.5', collapsed && 'justify-center px-0')}>
         <img src={logo} alt="" className="size-8 shrink-0 drop-shadow-[0_4px_12px_rgba(59,130,246,0.35)]" draggable={false} />

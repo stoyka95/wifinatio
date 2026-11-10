@@ -20,6 +20,35 @@ npm run tauri build -- --target x86_64-pc-windows-msvc
 
 Výstup najdete v `src-tauri/target/<target>/release/bundle/{msi,nsis}`.
 
+## Android (APK)
+
+Stejné UI a stejný Rust backend běží i na Androidu (minSdk 24, Android 7+). Na šířce telefonu se místo postranního panelu zobrazí horní lišta a spodní navigace; desktop (≥ 1024 px) zůstává beze změny.
+
+Potřeba: Android SDK (platform 37, build-tools), NDK 27, JDK 17+ a Rust targety `aarch64-linux-android` (případně `armv7-linux-androideabi`, `x86_64-linux-android`).
+
+```bash
+export ANDROID_HOME=~/Android/Sdk NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018
+npm run tauri android dev                          # běh na připojeném telefonu / emulátoru
+npm run tauri android build -- --apk --target aarch64
+```
+
+Nepodepsané APK: `src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk`. Podepsání:
+
+```bash
+keytool -genkeypair -v -keystore wifinatio.jks -alias wifinatio -keyalg RSA -keysize 2048 -validity 10000
+$ANDROID_HOME/build-tools/36.0.0/zipalign -f 4 app-universal-release-unsigned.apk aligned.apk
+$ANDROID_HOME/build-tools/36.0.0/apksigner sign --ks wifinatio.jks --out wifinatio.apk aligned.apk
+```
+
+Jak to funguje na Androidu:
+
+- **Wi-Fi a síť**: `gen/android/.../NetBridge.kt` čte `WifiManager` a `ConnectivityManager` a vrací JSON; Rust ho volá přes JNI (`android_bridge.rs`). Skeny obsahují surové 802.11 IE (Android 11+), takže šířku kanálu, standard, zabezpečení a vytížení kanálu parsuje stejný `ie.rs` jako na Windows.
+- **Ping, traceroute, MTU**: neprivilegované ICMP sockety (`SOCK_DGRAM` + `IPPROTO_ICMP`, `ping_unix.rs`), TTL-exceeded a „fragmentation needed“ přichází přes `IP_RECVERR`. Bez rootu a bez parsování `/system/bin/ping`.
+- **TLS**: rustls s přibalenými kořenovými certifikáty (na Windows dál SChannel).
+- **Oprávnění**: Android vydá SSID, BSSID a okolní sítě jen s povolenou polohou; aplikace o ni požádá při startu a tlačítko „Povolit polohu“ otevře dotaz nebo nastavení.
+- **Omezení**: Android povolí aplikaci 4 skeny za 2 minuty. Úsporný režim adaptéru, ovladač a plán napájení Windows na telefonu nejsou; místo nich se hlásí spořič baterie a nabíjení. Export do PDF (tisk) na Androidu není, Markdown a JSON se ukládají do složky Stažené.
+- Texty, které mluví o Windows, mají pro Android vlastní znění (`src/lib/i18n/android.ts`).
+
 ## Testy
 
 ```bash

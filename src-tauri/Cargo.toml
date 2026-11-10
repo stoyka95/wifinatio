@@ -20,7 +20,6 @@ tauri-plugin-notification = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"] }
-reqwest = { version = "0.13", default-features = false, features = ["native-tls", "stream", "json"] }
 futures-util = "0.3"
 bytes = "1"
 rusqlite = { version = "0.37", features = ["bundled"] }
@@ -29,10 +28,25 @@ chrono = { version = "0.4", default-features = false, features = ["clock", "std"
 rand = "0.9"
 thiserror = "2"
 log = "0.4"
+
+# Windows: native TLS (SChannel), Native WiFi / IP Helper / power APIs.
+[target.'cfg(windows)'.dependencies]
+reqwest = { version = "0.13", default-features = false, features = ["native-tls", "stream", "json"] }
 window-vibrancy = "0.6"
 winreg = "0.55"
 
-[dependencies.windows]
+# Android (and Linux for tests): rustls with bundled Mozilla roots, ICMP datagram sockets.
+[target.'cfg(not(windows))'.dependencies]
+reqwest = { version = "0.13", default-features = false, features = ["rustls-no-provider", "stream", "json"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+webpki-roots = "1"
+libc = "0.2"
+
+[target.'cfg(target_os = "android")'.dependencies]
+jni = "0.21"
+ndk-context = "0.1"
+
+[target.'cfg(windows)'.dependencies.windows]
 version = "0.62"
 features = [
   "Win32_Foundation",

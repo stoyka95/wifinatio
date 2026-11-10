@@ -32,3 +32,6 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 export const SETTINGS_ITEM: NavItem = { id: 'settings', icon: Settings };
+
+/** Phone bottom bar: the most used views; the rest sit behind "More". */
+export const MOBILE_PRIMARY: Section[] = ['dashboard', 'ping', 'speed', 'diagnosis'];

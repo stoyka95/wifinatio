@@ -170,8 +170,8 @@ export const DiagnosisPage = () => {
       {report ? (
         <ReportView report={report} />
       ) : (
-        <div className="grid grid-cols-12 gap-5">
-          <GlassCard className="col-span-7 flex flex-col items-center justify-center px-10 py-12 text-center">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+          <GlassCard className="flex flex-col items-center justify-center px-5 py-10 text-center lg:col-span-7 lg:px-10 lg:py-12">
             {running && steps ? (
               <div className="w-full max-w-md text-left">
                 <p className="mb-5 text-[17px] font-semibold text-fg">{t.wizard.running}</p>
@@ -210,7 +210,7 @@ export const DiagnosisPage = () => {
             )}
           </GlassCard>
 
-          <div className="col-span-5 flex flex-col gap-5">
+          <div className="flex flex-col gap-5 lg:col-span-5">
             <GlassCard>
               <Field label={t.wizard.duration}>
                 <Segmented ariaLabel={t.wizard.duration} value={duration} onChange={setDuration} options={[{ value: '30', label: '30 s' }, { value: '60', label: '60 s' }]} />

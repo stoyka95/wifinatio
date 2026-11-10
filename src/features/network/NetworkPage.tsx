@@ -22,7 +22,7 @@ const LocalCard = ({ info }: { info: NetInfo | null }) => {
         <InfoRow label={t.network.mask}>{v4?.mask ?? '—'}</InfoRow>
         <InfoRow label={t.network.gateway}>{info.gateway ?? '—'}</InfoRow>
         <InfoRow label={t.network.dnsServers}>{info.dnsServers.join(', ') || '—'}</InfoRow>
-        <InfoRow label={t.network.mac}>{info.mac}</InfoRow>
+        {info.mac && <InfoRow label={t.network.mac}>{info.mac}</InfoRow>}
         <InfoRow label={t.network.dhcp}>{info.dhcpEnabled ? t.common.yes : t.common.no}</InfoRow>
         {info.dhcpEnabled && <InfoRow label={t.network.dhcpServer}>{info.dhcpServer ?? '—'}</InfoRow>}
         {info.leaseObtained && <InfoRow label={t.network.leaseObtained}>{fmtDateTime(info.leaseObtained)}</InfoRow>}
@@ -120,7 +120,7 @@ export const NetworkPage = () => {
     <>
       <PageHeader title={t.network.title} />
       {local.error ? <Banner severity="bad" title={errorMessage(t, local.error)} /> : null}
-      <div className="grid grid-cols-2 items-start gap-5">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
         <LocalCard info={local.data} />
         <div className="flex flex-col gap-5">
           <PublicCard />

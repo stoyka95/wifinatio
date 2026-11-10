@@ -88,8 +88,7 @@ pub async fn run(app: &AppHandle, control: &SpeedControl) -> AppResult<SpeedResu
 }
 
 async fn run_inner(app: &AppHandle, control: &SpeedControl) -> AppResult<SpeedResult> {
-    let client = reqwest::Client::builder()
-        .user_agent(concat!("Wifinatio/", env!("CARGO_PKG_VERSION")))
+    let client = crate::netinfo::http_builder()
         .pool_max_idle_per_host(CONNECTIONS)
         .connect_timeout(Duration::from_secs(6))
         .build()?;

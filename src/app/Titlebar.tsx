@@ -4,6 +4,7 @@ import { Copy, Minus, Square, X } from 'lucide-react';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/cn';
 import { useT } from '@/lib/i18n';
+import { isMobile } from '@/lib/platform';
 
 const isTauri = '__TAURI_INTERNALS__' in window;
 
@@ -13,7 +14,7 @@ export const Titlebar = () => {
   const [maximized, setMaximized] = useState(false);
 
   useEffect(() => {
-    if (!isTauri) return;
+    if (!isTauri || isMobile) return;
     const win = getCurrentWindow();
     win.isMaximized().then(setMaximized).catch(() => undefined);
     const unlisten = win.onResized(() => win.isMaximized().then(setMaximized).catch(() => undefined));
@@ -21,6 +22,8 @@ export const Titlebar = () => {
       unlisten.then((u) => u()).catch(() => undefined);
     };
   }, []);
+
+  if (isMobile) return null;
 
   const caption = 'flex h-full w-[46px] items-center justify-center text-fg-muted transition-colors duration-100 [&_svg]:size-[14px]';
 

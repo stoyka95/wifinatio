@@ -1,9 +1,13 @@
 import { useSettingsStore } from '@/stores/settings';
+import { isAndroid } from '../platform';
+import { applyPatch, csAndroid, enAndroid } from './android';
 import { cs, type Dict } from './cs';
 import { en } from './en';
 import type { Language } from '../types';
 
-const dictionaries: Record<Language, Dict> = { cs, en };
+const dictionaries: Record<Language, Dict> = isAndroid
+  ? { cs: applyPatch(cs, csAndroid), en: applyPatch(en, enAndroid) }
+  : { cs, en };
 
 export const getDict = (language: Language): Dict => dictionaries[language] ?? cs;
 

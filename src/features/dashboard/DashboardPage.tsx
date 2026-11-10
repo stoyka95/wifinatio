@@ -24,7 +24,7 @@ const Verdict = () => {
   const { diagnosis, health } = useLiveAnalysis();
   const go = useUiStore((s) => s.go);
   return (
-    <div className="flex min-w-0 flex-1 flex-col justify-center gap-5">
+    <div className="flex min-w-0 flex-1 flex-col justify-center gap-4 lg:gap-5">
       <div className="flex items-start gap-3">
         <SeverityIcon severity={diagnosis.severity} className="mt-1 size-6" />
         <motion.p
@@ -32,12 +32,12 @@ const Verdict = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.25 }}
-          className="max-w-[52ch] text-[21px] leading-snug font-semibold tracking-[-0.015em] text-fg text-balance"
+          className="max-w-[52ch] text-[18px] leading-snug lg:text-[21px] font-semibold tracking-[-0.015em] text-fg text-balance"
         >
           {t.diagnosis[diagnosis.code](diagnosis.params)}
         </motion.p>
       </div>
-      <div className="flex flex-wrap items-center gap-2 pl-9">
+      <div className="flex flex-wrap items-center gap-2 lg:pl-9">
         {diagnosis.location !== 'none' && diagnosis.code !== 'collecting' && (
           <span className="glass-strong rounded-full px-3 py-1 text-[12.5px] font-medium text-fg">{t.diagnosis.whereLabel[diagnosis.location]}</span>
         )}
@@ -60,7 +60,7 @@ const KeyNumbers = () => {
   const loss = Math.max(gateway?.lossPct ?? 0, internet?.lossPct ?? 0);
   const rssiLevel = rssi !== null ? rateRssi(rssi) : null;
   return (
-    <div className="grid grid-cols-5 gap-4 border-t border-line pt-5">
+    <div className="grid grid-cols-2 gap-4 border-t border-line pt-5 sm:grid-cols-3 lg:grid-cols-5">
       <StatTile label={t.metric.rssi} value={rssi ?? '—'} unit="dBm" level={rssiLevel} hint={rssi !== null && rssiLevel ? t.explain.rssi(rssi, band, rssiLevel) : undefined} />
       <StatTile
         label={t.metric.gatewayPing}
@@ -87,8 +87,8 @@ const HealthHero = () => {
   const { health, diagnosis } = useLiveAnalysis();
   const collecting = diagnosis.code === 'collecting';
   return (
-    <GlassCard className="flex flex-col gap-2 p-6">
-      <div className="flex items-center gap-8">
+    <GlassCard className="flex flex-col gap-2 p-5 lg:p-6">
+      <div className="flex flex-col items-center gap-4 sm:flex-row lg:gap-8">
         <HealthGauge
           score={collecting ? null : health.score}
           level={collecting ? null : health.level}
@@ -109,8 +109,8 @@ const ConnectionCard = () => {
 
   if (!wifi) {
     return (
-      <GlassCard title={t.dashboard.connection} className="col-span-7">
-        <div className="grid grid-cols-2 gap-x-10 gap-y-3">
+      <GlassCard title={t.dashboard.connection} className="lg:col-span-7">
+        <div className="grid grid-cols-1 gap-x-10 gap-y-3 sm:grid-cols-2">
           {Array.from({ length: 8 }, (_, i) => (
             <Skeleton key={i} className="h-7" />
           ))}
@@ -122,7 +122,7 @@ const ConnectionCard = () => {
     // Connected but without details: Windows withholds them until location access is granted.
     const withheld = wifi.state === 'connected';
     return (
-      <GlassCard title={t.dashboard.connection} className="col-span-7">
+      <GlassCard title={t.dashboard.connection} className="lg:col-span-7">
         {withheld ? (
           <EmptyState
             icon={<MapPin />}
@@ -151,9 +151,9 @@ const ConnectionCard = () => {
         </span>
       }
       subtitle={wifi.adapter}
-      className="col-span-7"
+      className="lg:col-span-7"
     >
-      <dl className="grid grid-cols-2 gap-x-10">
+      <dl className="grid grid-cols-1 gap-x-10 sm:grid-cols-2">
         <div>
           <InfoRow label={t.metric.rssi} hint={conn.rssi !== null && rssiLevel ? t.explain.rssi(conn.rssi, conn.band, rssiLevel) : undefined}>
             {conn.rssi !== null ? `${conn.rssi} dBm (${fmtPercent(conn.signalQuality, 0)})` : fmtPercent(conn.signalQuality, 0)}
@@ -178,7 +178,7 @@ const ConnectionCard = () => {
           <InfoRow label={t.metric.bssid} hint={t.explain.bssid}>
             {conn.bssid}
           </InfoRow>
-          <InfoRow label={t.metric.cipher}>{conn.cipher.toUpperCase()}</InfoRow>
+          {conn.cipher && <InfoRow label={t.metric.cipher}>{conn.cipher.toUpperCase()}</InfoRow>}
           <InfoRow label={t.metric.profile}>{conn.profile}</InfoRow>
         </div>
       </dl>
@@ -217,7 +217,7 @@ const Sparklines = () => {
   }, [ping, pingVersion, signal]);
 
   return (
-    <div className="col-span-5 flex flex-col gap-4">
+    <div className="flex flex-col gap-4 lg:col-span-5">
       <SparkCard title={`${t.metric.gatewayPing}, ${t.dashboard.last5min.toLowerCase()}`} value={fmtMs(gateway?.avg)}>
         <Sparkline points={gw} color="cyan" unit="ms" ariaLabel={t.metric.gatewayPing} height={56} />
       </SparkCard>
@@ -234,7 +234,7 @@ const Sparklines = () => {
 export const DashboardPage = () => (
   <div className="flex flex-col gap-5 pt-1">
     <HealthHero />
-    <div className="grid grid-cols-12 gap-5">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
       <ConnectionCard />
       <Sparklines />
     </div>

@@ -157,9 +157,9 @@ export const ChannelsPage = () => {
         </div>
       )}
 
-      <div className="mb-5 grid grid-cols-12 gap-5">
+      <div className="mb-5 grid grid-cols-1 gap-5 lg:grid-cols-12">
         <GlassCard
-          className="col-span-8"
+          className="lg:col-span-8"
           title={t.channels.spectrum}
           actions={<Segmented ariaLabel={t.metric.band} value={band} onChange={setBand} options={bands.map((b) => ({ value: b, label: bandLabel(b) }))} />}
         >
@@ -171,7 +171,7 @@ export const ChannelsPage = () => {
             <EmptyState icon={<Radar />} title={t.channels.empty} className="h-[300px]" />
           )}
         </GlassCard>
-        <GlassCard className="col-span-4" title={t.channels.recommendation} subtitle={bandLabel(band)}>
+        <GlassCard className="lg:col-span-4" title={t.channels.recommendation} subtitle={bandLabel(band)}>
           {data ? <Recommendation networks={networks} band={band} /> : <Skeleton className="h-40" />}
         </GlassCard>
       </div>

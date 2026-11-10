@@ -152,7 +152,7 @@ const TraceCard = () => {
             {result.hops.map((hop) => {
               const jump = jumps.has(hop.ttl);
               return (
-                <li key={hop.ttl} className={cn('grid grid-cols-[24px_minmax(0,1fr)_140px_44px] items-center gap-3 rounded-xl px-2 py-2 text-[13px]', jump && 'bg-warn-soft')}>
+                <li key={hop.ttl} className={cn('grid grid-cols-[20px_minmax(0,1fr)_96px_36px] items-center gap-2 rounded-xl px-1 py-2 text-[13px] sm:grid-cols-[24px_minmax(0,1fr)_140px_44px] sm:gap-3 sm:px-2', jump && 'bg-warn-soft')}>
                   <span className="num text-fg-faint">{hop.ttl}</span>
                   <span className="min-w-0">
                     {hop.address ? (
@@ -193,7 +193,7 @@ export const DnsTracePage = () => {
   return (
     <>
       <PageHeader title={t.dnsTrace.title} />
-      <div className="grid grid-cols-2 items-start gap-5">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
         <DnsCard />
         <TraceCard />
       </div>
